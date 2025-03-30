@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import lombok.*;
+import org.hibernate.validator.constraints.br.CPF;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ public class Person implements Serializable {
 
     @Column(nullable = false, unique = true)
     @NotBlank (message = "CPF é obrigatório!")
+    @CPF(message = "CPF inválido!")
     private String cpf;
 
     @Column(nullable = false)
