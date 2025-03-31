@@ -10,39 +10,43 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @RestController
-@RequestMapping("api/persons")
+@RequestMapping("/api/persons")
 public class PersonController {
 
     private final PersonService personService;
 
-    @GetMapping
-    public List<Person> GetAllPersons(){
-        return personService.findAll();
+    public PersonController(PersonService personService) {
+        this.personService = personService;
+    }
+
+    @PostMapping
+    public ResponseEntity<Person> createPerson(@RequestBody Person person) {
+        return ResponseEntity.ok(personService.save(person));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Person> getPersonById(@PathVariable Long id){
-        Person person = personService.findById(id);
+    public ResponseEntity<Person> getPersonById(@PathVariable Long id) {
+        Person person = personService.findById(id).orElse(null);
         return ResponseEntity.ok(person);
     }
-    @PostMapping
-    public ResponseEntity<Person> createPerson(@Valid @RequestBody Person person){
-        Person savedPerson = personService.save(person);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPerson);
+
+    @GetMapping
+    public ResponseEntity<List<Person>> getAllPersons() {
+        return ResponseEntity.ok(personService.findAll());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Person> updatePerson(@PathVariable Long id, @Valid @RequestBody Person person){
+    public ResponseEntity<Person> updatePerson(@PathVariable Long id, @RequestBody Person person) {
         person.setId(id);
-        Person updatePerson = personService.update(person);
-        return ResponseEntity.ok(updatePerson);
+        Person updatedPerson = personService.save(person);
+        return ResponseEntity.ok(updatedPerson);
     }
 
-        @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePerson(@PathVariable Long id){
-        personService.delete(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
+        personService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
 }

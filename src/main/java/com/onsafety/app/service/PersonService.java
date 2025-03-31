@@ -3,44 +3,31 @@ package com.onsafety.app.service;
 import com.onsafety.app.exception.ResourceNotFoundException;
 import com.onsafety.app.model.Person;
 import com.onsafety.app.repository.PersonRepository;
+import com.onsafety.app.service.generics.GenericService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-public class PersonService {
+public class PersonService extends GenericService<Person, Long>{
 
-    private final PersonRepository personRepository;
 
-    public List<Person> findAll(){
-        return personRepository.findAll();
+    public PersonService(PersonRepository personRepository) {
+        super(personRepository);
     }
 
-    public Person findById(Long id){
-        return personRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com este ID. número:" + id));
+    @Override
+    public Optional<Person> findById(Long id) {
+        return Optional.ofNullable(super.getRepository().findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Pessoa com ID " + id + " não foi encontrada.")));
     }
 
-    public Person save(Person person){
-        return personRepository.save(person);
+    public boolean existsByCpf(String cpf) {
+        return ((PersonRepository) getRepository()).existsByCpf(cpf);
     }
 
-    @Transactional
-    public Person update(Person person){
-        if(person.getId() == null || !personRepository.existsById(person.getId())){
-            throw new ResourceNotFoundException("Pessoa não encontrada com este ID");
-        }
-        return personRepository.save(person);
-    }
 
-    @Transactional
-    public void delete (Long id){
-        if (id == null || !personRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Pessoa não encontrada com este ID. número:" + id);
-        }
-        personRepository.deleteById(id);
-    }
 }

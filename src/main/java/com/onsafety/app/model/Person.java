@@ -34,7 +34,7 @@ public class Person implements Serializable {
 
     @Column(nullable = false)
     @Past(message = "A data de nascimento deve ser anterior à data atual")
-    private LocalDate dataNascimento;
+    private LocalDate birthDate;
 
     @Column(nullable = false)
     @Email(message = "Email inválido!")
